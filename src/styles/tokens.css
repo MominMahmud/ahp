@@ -1,0 +1,45 @@
+:root {
+  /* Ink (text) */
+  --ink-900: #101a17;
+  --ink-700: #37443f;
+  --ink-500: #647068;
+  --ink-300: #9aa49d;
+
+  /* Surfaces */
+  --bg: #f5f3ec;
+  --surface: #ffffff;
+  --surface-sunken: #eceadf;
+  --line: #e1dccb;
+  --line-strong: #cfc8ae;
+
+  /* Accent: deep teal */
+  --accent-900: #0a4a42;
+  --accent-700: #0f6c5f;
+  --accent-600: #13806f;
+  --accent-soft: #e2f2ec;
+
+  /* Secondary accent: warm amber, used sparingly */
+  --pop-600: #c97a2b;
+  --pop-soft: #faf0df;
+
+  /* Status */
+  --danger-600: #b5452f;
+
+  /* Type */
+  --font-display: 'Fraunces', 'Iowan Old Style', ui-serif, Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Shape */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-full: 999px;
+
+  /* Shadow */
+  --shadow-card: 0 1px 2px rgba(16, 26, 23, 0.04), 0 12px 32px -16px rgba(16, 26, 23, 0.18);
+  --shadow-lifted: 0 2px 4px rgba(16, 26, 23, 0.06), 0 24px 48px -20px rgba(16, 26, 23, 0.26);
+
+  /* Layout */
+  --nav-height: 76px;
+  --container-width: 1180px;
+}
