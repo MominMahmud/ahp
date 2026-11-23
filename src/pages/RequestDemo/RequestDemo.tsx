@@ -15,7 +15,8 @@ const STEP_COPY: Record<(typeof STEPS)[number], { title: string; subtitle: strin
 
 export function RequestDemo() {
   const demo = useDemoForm()
-  const { form, set, toggleInterest, errors, attempted, status, step, stepId, totalSteps, isLastStep, handleStepSubmit, goBack, reset } = demo
+  const { form, set, toggleInterest, errors, attempted, status, submitError, step, stepId, totalSteps, isLastStep, handleStepSubmit, goBack, reset } =
+    demo
   const copy = STEP_COPY[stepId]
 
   return (
@@ -149,6 +150,7 @@ export function RequestDemo() {
                   <>
                     <SecondaryField label="Phone (optional)">
                       <input type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="Optional" />
+                      {attempted && errors.phone ? <span className={styles.error}>{errors.phone}</span> : null}
                     </SecondaryField>
                     <SecondaryField label="Anything we should know? (optional)">
                       <textarea
@@ -160,7 +162,20 @@ export function RequestDemo() {
                     </SecondaryField>
                   </>
                 ) : null}
+
+                {/* Honeypot — invisible to real visitors; a bot that fills every field trips it. */}
+                <input
+                  type="text"
+                  value={form.website}
+                  onChange={(e) => set('website', e.target.value)}
+                  className={styles.honeypot}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
               </div>
+
+              {submitError ? <p className={styles.submitError}>{submitError}</p> : null}
 
               <button type="submit" className={styles.submitButton} disabled={status === 'submitting'}>
                 {status === 'submitting' ? 'Sending…' : isLastStep ? 'Request my demo' : 'Continue'}
