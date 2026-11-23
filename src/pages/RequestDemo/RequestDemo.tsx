@@ -1,17 +1,29 @@
 import type { ReactNode } from 'react'
 import { VALUE_PROPS } from '@/content/valueProps'
-import { CalendarIcon, ChevronIcon } from './icons'
-import { ENVIRONMENT_SIZE_OPTIONS, INTEREST_OPTIONS, useDemoForm } from './useDemoForm'
+import { DateChipPicker } from './DateChipPicker'
+import { ENVIRONMENT_SIZE_OPTIONS, INTEREST_OPTIONS, STEPS, useDemoForm } from './useDemoForm'
 import styles from './RequestDemo.module.css'
 
-const STEPS = [
+const FOOTER_STEPS = [
   { n: '01', label: 'Send the form' },
   { n: '02', label: 'We reach out to pick a time' },
   { n: '03', label: 'Live walkthrough' },
 ] as const
 
+const STEP_COPY: Record<(typeof STEPS)[number], { title: string; subtitle: string }> = {
+  name: { title: "What's your name?", subtitle: "So we know who we're talking to." },
+  email: { title: "What's your work email?", subtitle: "We'll send the confirmation here." },
+  company: { title: 'Where do you work?', subtitle: "Company name, and your role if you don't mind." },
+  environment: { title: 'How big is your environment?', subtitle: 'Roughly — this just helps us tailor the walkthrough.' },
+  interests: { title: 'What would you like to see?', subtitle: 'Pick as many as you like.' },
+  date: { title: 'When works best for you?', subtitle: "Pick a day — we'll follow up to lock in a time." },
+  wrapup: { title: 'Anything else?', subtitle: 'Phone number and notes are both optional.' },
+}
+
 export function RequestDemo() {
-  const { form, set, toggleInterest, errors, attempted, status, submit, reset } = useDemoForm()
+  const demo = useDemoForm()
+  const { form, set, toggleInterest, errors, attempted, status, step, stepId, totalSteps, isLastStep, handleStepSubmit, goBack, reset } = demo
+  const copy = STEP_COPY[stepId]
 
   return (
     <main className={styles.page}>
@@ -41,11 +53,11 @@ export function RequestDemo() {
           </ul>
 
           <ol className={styles.steps}>
-            {STEPS.map((step, i) => (
-              <li key={step.n} className={styles.step}>
-                <span className={styles.stepNum}>{step.n}</span>
-                <span>{step.label}</span>
-                {i < STEPS.length - 1 ? <span className={styles.stepDivider} aria-hidden="true" /> : null}
+            {FOOTER_STEPS.map((s, i) => (
+              <li key={s.n} className={styles.step}>
+                <span className={styles.stepNum}>{s.n}</span>
+                <span>{s.label}</span>
+                {i < FOOTER_STEPS.length - 1 ? <span className={styles.stepDivider} aria-hidden="true" /> : null}
               </li>
             ))}
           </ol>
@@ -67,96 +79,129 @@ export function RequestDemo() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={submit} noValidate>
-                <h2 className={styles.cardTitle}>Request a demo</h2>
-                <p className={styles.cardSubtitle}>Tell us a little about you. It takes about a minute.</p>
-
-                <div className={styles.row2}>
-                  <Field label="Full name" required error={attempted ? errors.fullName : null}>
-                    <input value={form.fullName} onChange={(e) => set('fullName', e.target.value)} placeholder="Jane Doe" />
-                  </Field>
-                  <Field label="Work email" required error={attempted ? errors.workEmail : null}>
-                    <input
-                      type="email"
-                      value={form.workEmail}
-                      onChange={(e) => set('workEmail', e.target.value)}
-                      placeholder="you@company.com"
-                    />
-                  </Field>
+              <form onSubmit={handleStepSubmit} noValidate>
+                <div className={styles.progressRow}>
+                  {step > 0 ? (
+                    <button type="button" className={styles.backChevron} onClick={goBack} aria-label="Previous question">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  ) : (
+                    <span />
+                  )}
+                  <span className={styles.progressTrack}>
+                    <span className={styles.progressFill} style={{ width: `${((step + 1) / totalSteps) * 100}%` }} />
+                  </span>
+                  <span className={styles.progressLabel}>
+                    {step + 1} / {totalSteps}
+                  </span>
                 </div>
 
-                <div className={styles.row2}>
-                  <Field label="Company" required error={attempted ? errors.company : null}>
-                    <input value={form.company} onChange={(e) => set('company', e.target.value)} placeholder="Acme Corp" />
-                  </Field>
-                  <Field label="Job title">
-                    <input value={form.jobTitle} onChange={(e) => set('jobTitle', e.target.value)} placeholder="IT Manager" />
-                  </Field>
-                </div>
+                <h2 className={styles.stepTitle}>{copy.title}</h2>
+                <p className={styles.stepSubtitle}>{copy.subtitle}</p>
 
-                <div className={styles.row2}>
-                  <Field label="Phone">
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) => set('phone', e.target.value)}
-                      placeholder="Optional"
-                    />
-                  </Field>
-                  <Field label="Environment size">
-                    <div className={styles.selectWrap}>
-                      <select value={form.environmentSize} onChange={(e) => set('environmentSize', e.target.value)}>
-                        <option value="">Select a range</option>
-                        {ENVIRONMENT_SIZE_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronIcon className={styles.selectChevron} />
+                <div className={styles.stepBody}>
+                  {stepId === 'name' ? (
+                    <>
+                      <input
+                        key="name"
+                        autoFocus
+                        className={styles.heroInput}
+                        value={form.fullName}
+                        onChange={(e) => set('fullName', e.target.value)}
+                        placeholder="Jane Doe"
+                        aria-label="Full name"
+                      />
+                      {attempted && errors.fullName ? <span className={styles.error}>{errors.fullName}</span> : null}
+                    </>
+                  ) : null}
+
+                  {stepId === 'email' ? (
+                    <>
+                      <input
+                        key="email"
+                        autoFocus
+                        type="email"
+                        className={styles.heroInput}
+                        value={form.workEmail}
+                        onChange={(e) => set('workEmail', e.target.value)}
+                        placeholder="you@company.com"
+                        aria-label="Work email"
+                      />
+                      {attempted && errors.workEmail ? <span className={styles.error}>{errors.workEmail}</span> : null}
+                    </>
+                  ) : null}
+
+                  {stepId === 'company' ? (
+                    <>
+                      <input
+                        key="company"
+                        autoFocus
+                        className={styles.heroInput}
+                        value={form.company}
+                        onChange={(e) => set('company', e.target.value)}
+                        placeholder="Acme Corp"
+                        aria-label="Company"
+                      />
+                      {attempted && errors.company ? <span className={styles.error}>{errors.company}</span> : null}
+                      <SecondaryField label="Job title (optional)">
+                        <input value={form.jobTitle} onChange={(e) => set('jobTitle', e.target.value)} placeholder="IT Manager" />
+                      </SecondaryField>
+                    </>
+                  ) : null}
+
+                  {stepId === 'environment' ? (
+                    <div className={styles.chipGrid}>
+                      {ENVIRONMENT_SIZE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          className={styles.pickChip}
+                          data-selected={form.environmentSize === opt}
+                          onClick={() => set('environmentSize', opt)}
+                        >
+                          {opt}
+                        </button>
+                      ))}
                     </div>
-                  </Field>
+                  ) : null}
+
+                  {stepId === 'interests' ? (
+                    <div className={styles.cardList}>
+                      {INTEREST_OPTIONS.map((opt) => (
+                        <label key={opt.id} className={styles.optionCard} data-selected={form.interests.has(opt.id)}>
+                          <input type="checkbox" checked={form.interests.has(opt.id)} onChange={() => toggleInterest(opt.id)} />
+                          <span className={styles.optionCardCheck} aria-hidden="true" />
+                          {opt.label}
+                        </label>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {stepId === 'date' ? <DateChipPicker value={form.preferredDate} onChange={(iso) => set('preferredDate', iso)} /> : null}
+
+                  {stepId === 'wrapup' ? (
+                    <>
+                      <SecondaryField label="Phone (optional)">
+                        <input type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="Optional" />
+                      </SecondaryField>
+                      <SecondaryField label="Anything we should know? (optional)">
+                        <textarea
+                          rows={3}
+                          value={form.notes}
+                          onChange={(e) => set('notes', e.target.value)}
+                          placeholder="Your current tools, what you want to fix, questions…"
+                        />
+                      </SecondaryField>
+                    </>
+                  ) : null}
                 </div>
-
-                <fieldset className={styles.fieldset}>
-                  <legend className={styles.label}>What would you like to see?</legend>
-                  <div className={styles.checkGrid}>
-                    {INTEREST_OPTIONS.map((opt) => (
-                      <label key={opt.id} className={styles.checkOption}>
-                        <input type="checkbox" checked={form.interests.has(opt.id)} onChange={() => toggleInterest(opt.id)} />
-                        <span className={styles.checkBox} aria-hidden="true" />
-                        {opt.label}
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-
-                <Field label="Preferred date">
-                  <div className={styles.dateWrap}>
-                    <CalendarIcon className={styles.dateIcon} />
-                    <input
-                      type="date"
-                      value={form.preferredDate}
-                      onChange={(e) => set('preferredDate', e.target.value)}
-                      aria-label="Preferred date"
-                    />
-                    {!form.preferredDate ? <span className={styles.dateFakePlaceholder}>Pick a day that suits you</span> : null}
-                  </div>
-                </Field>
-
-                <Field label="Anything we should know?">
-                  <textarea
-                    rows={3}
-                    value={form.notes}
-                    onChange={(e) => set('notes', e.target.value)}
-                    placeholder="Your current tools, what you want to fix, questions…"
-                  />
-                </Field>
 
                 <button type="submit" className={styles.submitButton} disabled={status === 'submitting'}>
-                  {status === 'submitting' ? 'Sending…' : 'Request my demo'}
+                  {status === 'submitting' ? 'Sending…' : isLastStep ? 'Request my demo' : 'Continue'}
                 </button>
-                <p className={styles.fineprint}>We only use your details to arrange the demo.</p>
+                {step === 0 ? <p className={styles.fineprint}>We only use your details to arrange the demo.</p> : null}
               </form>
             )}
           </div>
@@ -166,24 +211,11 @@ export function RequestDemo() {
   )
 }
 
-function Field({
-  label,
-  required,
-  error,
-  children,
-}: {
-  label: string
-  required?: boolean
-  error?: string | null
-  children: ReactNode
-}) {
+function SecondaryField({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className={styles.field}>
-      <span className={styles.label}>
-        {label} {required ? <span className={styles.required}>*</span> : null}
-      </span>
+      <span className={styles.label}>{label}</span>
       {children}
-      {error ? <span className={styles.error}>{error}</span> : null}
     </label>
   )
 }

@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ORIGIN_SITE_NAME, ORIGIN_SITE_URL } from '@/siteConfig'
+import { getBackNavTarget } from '@/siteConfig'
 import styles from './Footer.module.css'
 
 export function Footer() {
+  const [backTarget] = useState(getBackNavTarget)
+
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.inner}`}>
@@ -15,7 +18,7 @@ export function Footer() {
           <Link to="/">Home</Link>
           <Link to="/request-demo">Request a Demo</Link>
           <Link to="/login">Login</Link>
-          <a href={ORIGIN_SITE_URL}>{ORIGIN_SITE_NAME}</a>
+          {backTarget.kind === 'link' ? <a href={backTarget.url}>{backTarget.label}</a> : null}
         </nav>
       </div>
     </footer>

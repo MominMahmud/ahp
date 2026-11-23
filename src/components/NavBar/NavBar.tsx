@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { ORIGIN_SITE_NAME, ORIGIN_SITE_URL } from '@/siteConfig'
+import { getBackNavTarget } from '@/siteConfig'
 import styles from './NavBar.module.css'
 
 const LINKS = [
@@ -8,7 +9,17 @@ const LINKS = [
   { to: '/login', label: 'Login' },
 ]
 
+function BackArrow() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M19 12H5M5 12L11 6M5 12L11 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function NavBar() {
+  const [backTarget] = useState(getBackNavTarget)
+
   return (
     <header className={styles.bar}>
       <div className={`container ${styles.inner}`}>
@@ -32,12 +43,17 @@ export function NavBar() {
           ))}
         </nav>
 
-        <a href={ORIGIN_SITE_URL} className={styles.back}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M19 12H5M5 12L11 6M5 12L11 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span>Back to {ORIGIN_SITE_NAME}</span>
-        </a>
+        {backTarget.kind === 'link' ? (
+          <a href={backTarget.url} className={styles.back}>
+            <BackArrow />
+            <span>Back to {backTarget.label}</span>
+          </a>
+        ) : (
+          <button type="button" className={styles.back} onClick={() => window.history.back()}>
+            <BackArrow />
+            <span>Back</span>
+          </button>
+        )}
       </div>
     </header>
   )

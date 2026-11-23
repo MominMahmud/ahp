@@ -40,8 +40,12 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type DemoFormStatus = 'idle' | 'submitting' | 'success'
 
+export const STEPS = ['name', 'email', 'company', 'environment', 'interests', 'date', 'wrapup'] as const
+export type StepId = (typeof STEPS)[number]
+
 export function useDemoForm() {
   const [form, setForm] = useState<FormState>(INITIAL_STATE)
+  const [step, setStep] = useState(0)
   const [attempted, setAttempted] = useState(false)
   const [status, setStatus] = useState<DemoFormStatus>('idle')
 
@@ -64,13 +68,13 @@ export function useDemoForm() {
     company: form.company.trim() ? null : 'Enter your company name.',
   }
 
-  const hasErrors = Object.values(errors).some(Boolean)
+  const stepId = STEPS[step]
+  const isLastStep = step === STEPS.length - 1
 
-  async function submit(e: FormEvent) {
-    e.preventDefault()
-    setAttempted(true)
-    if (hasErrors) return
+  const canContinue =
+    stepId === 'name' ? !errors.fullName : stepId === 'email' ? !errors.workEmail : stepId === 'company' ? !errors.company : true
 
+  async function doSubmit() {
     setStatus('submitting')
     // No backend exists for this marketing site yet — this simulates submission.
     // Wire this up to a real endpoint (e.g. email relay or CRM webhook) before going live.
@@ -78,11 +82,46 @@ export function useDemoForm() {
     setStatus('success')
   }
 
+  function handleStepSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!canContinue) {
+      setAttempted(true)
+      return
+    }
+    if (isLastStep) {
+      void doSubmit()
+      return
+    }
+    setAttempted(false)
+    setStep((s) => s + 1)
+  }
+
+  function goBack() {
+    setAttempted(false)
+    setStep((s) => Math.max(0, s - 1))
+  }
+
   function reset() {
     setForm(INITIAL_STATE)
+    setStep(0)
     setAttempted(false)
     setStatus('idle')
   }
 
-  return { form, set, toggleInterest, errors, attempted, hasErrors, status, submit, reset }
+  return {
+    form,
+    set,
+    toggleInterest,
+    errors,
+    attempted,
+    status,
+    step,
+    stepId,
+    totalSteps: STEPS.length,
+    isLastStep,
+    canContinue,
+    handleStepSubmit,
+    goBack,
+    reset,
+  }
 }

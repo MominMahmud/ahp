@@ -131,6 +131,9 @@
   border-radius: var(--radius-lg);
   padding: 32px;
   box-shadow: var(--shadow-lifted);
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
 }
 
 .cardTitle {
@@ -144,22 +147,80 @@
   color: var(--ink-500);
 }
 
-.row2 {
+/* --- Stepper chrome --- */
+
+.progressRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-top: 20px;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
 }
+
+.backChevron {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink-700);
+  cursor: pointer;
+}
+
+.backChevron:hover {
+  border-color: var(--ink-500);
+  color: var(--ink-900);
+}
+
+.progressTrack {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  background: var(--accent-700);
+  border-radius: var(--radius-full);
+  transition: width 0.25s ease;
+}
+
+.progressLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-500);
+  white-space: nowrap;
+}
+
+.stepTitle {
+  margin-top: 28px;
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 600;
+}
+
+.stepSubtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--ink-500);
+}
+
+.stepBody {
+  margin-top: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* --- Fields --- */
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 20px;
-}
-
-.row2 .field {
-  margin-top: 0;
 }
 
 .label {
@@ -170,13 +231,8 @@
   color: var(--ink-500);
 }
 
-.required {
-  color: var(--pop-600);
-}
-
 .field input,
-.field textarea,
-.selectWrap select {
+.field textarea {
   width: 100%;
   font: inherit;
   font-size: 14px;
@@ -194,8 +250,7 @@
 }
 
 .field input:focus,
-.field textarea:focus,
-.selectWrap select:focus {
+.field textarea:focus {
   outline: none;
   border-color: var(--accent-600);
   box-shadow: 0 0 0 3px var(--accent-soft);
@@ -211,58 +266,103 @@
   color: var(--danger-600);
 }
 
-.selectWrap {
-  position: relative;
-}
-
-.selectWrap select {
-  appearance: none;
-  padding-right: 34px;
-  cursor: pointer;
-}
-
-.selectChevron {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--ink-500);
-  pointer-events: none;
-}
-
-.fieldset {
+.heroInput {
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 500;
+  padding: 6px 2px 14px;
   border: none;
-  padding: 0;
-  margin: 20px 0 0;
+  border-bottom: 2px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink-900);
+  transition: border-color 0.15s ease;
 }
 
-.checkGrid {
-  margin-top: 10px;
+.heroInput::placeholder {
+  color: var(--ink-300);
+}
+
+.heroInput:focus {
+  outline: none;
+  border-color: var(--accent-700);
+}
+
+/* --- Single-select chips (environment size) --- */
+
+.chipGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px 16px;
+  gap: 10px;
 }
 
-.checkOption {
+.pickChip {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-700);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.pickChip:hover {
+  border-color: var(--ink-500);
+}
+
+.pickChip[data-selected='true'] {
+  border-color: var(--accent-700);
+  background: var(--accent-soft);
+  color: var(--accent-900);
+}
+
+/* --- Multi-select cards (interests) --- */
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.optionCard {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-size: 13.5px;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
   color: var(--ink-700);
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
-.checkOption input {
+.optionCard:hover {
+  border-color: var(--ink-500);
+}
+
+.optionCard[data-selected='true'] {
+  border-color: var(--accent-700);
+  background: var(--accent-soft);
+  color: var(--accent-900);
+}
+
+.optionCard input {
   position: absolute;
   opacity: 0;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   margin: 0;
   cursor: pointer;
 }
 
-.checkBox {
+.optionCardCheck {
   flex-shrink: 0;
   width: 18px;
   height: 18px;
@@ -273,12 +373,12 @@
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.checkOption input:checked + .checkBox {
+.optionCard[data-selected='true'] .optionCardCheck {
   background: var(--accent-700);
   border-color: var(--accent-700);
 }
 
-.checkOption input:checked + .checkBox::after {
+.optionCard[data-selected='true'] .optionCardCheck::after {
   content: '';
   position: absolute;
   left: 5px;
@@ -290,35 +390,96 @@
   transform: rotate(45deg);
 }
 
-.checkOption input:focus-visible + .checkBox {
+.optionCard input:focus-visible + .optionCardCheck {
   outline: 2px solid var(--accent-600);
   outline-offset: 2px;
 }
 
-.dateWrap {
-  position: relative;
+/* --- Date chip picker --- */
+
+.dateChips {
   display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dateChip {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 4px;
+  min-width: 56px;
+  padding: 10px 6px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
-.dateIcon {
-  position: absolute;
-  left: 12px;
+.dateChip:hover {
+  border-color: var(--ink-500);
+}
+
+.dateChip[data-selected='true'] {
+  border-color: var(--accent-700);
+  background: var(--accent-700);
+}
+
+.dateChipDay {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--ink-500);
-  pointer-events: none;
 }
 
-.dateWrap input[type='date'] {
-  padding-left: 38px;
+.dateChip[data-selected='true'] .dateChipDay {
+  color: var(--accent-soft);
 }
 
-.dateFakePlaceholder {
-  position: absolute;
-  left: 38px;
+.dateChipNum {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.dateChip[data-selected='true'] .dateChipNum {
+  color: #fff;
+}
+
+.dateCustomToggle {
+  margin-top: 14px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-700);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dateCustomInput {
+  margin-top: 14px;
+  width: 100%;
+  font: inherit;
   font-size: 14px;
-  color: var(--ink-300);
-  pointer-events: none;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--bg);
+  color: var(--ink-900);
 }
+
+.dateCustomInput:focus {
+  outline: none;
+  border-color: var(--accent-600);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* --- Submit / footer --- */
 
 .submitButton {
   margin-top: 26px;
@@ -357,6 +518,7 @@
 .success {
   text-align: center;
   padding: 20px 0 8px;
+  margin: auto 0;
 }
 
 .successMark {
@@ -400,8 +562,7 @@
 }
 
 @media (max-width: 520px) {
-  .row2,
-  .checkGrid {
+  .chipGrid {
     grid-template-columns: 1fr;
   }
 
